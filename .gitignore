@@ -30,3 +30,13 @@
 
 # Debug files
 *.dSYM/
+
+# davek
+*.session
+.local.vim*
+*~
+*.orig
+.backup/
+obj/
+dist/
+
