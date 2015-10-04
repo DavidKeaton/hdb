@@ -4,48 +4,49 @@ SRC_DIR		= src
 OBJ_DIR		= obj
 OUT_DIR		= dist
 
-SOURCES		= $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES		= $(wildcard $(SRC_DIR)/*.c)
 HEADERS		= $(wildcard $(SRC_DIR)/*.h)
-_OBJS		= $(SOURCES:$(SRC_DIR)/%.cpp=%.o)
-OBJS		= $(patsubst %,$(OUT_DIR)/%,$(_OBJS))
+_OBJS		= $(SOURCES:$(SRC_DIR)/%.c=%.o)
+OBJS		= $(patsubst %,$(OBJ_DIR)/%,$(_OBJS))
 LIBS		= -lncurses
 
 WARNINGS	= -Wall
-CXXFLAGS	+= $(WARNINGS)
+CFLAGS		+= $(WARNINGS)
+DEFINES		=
 
 
 # if `clang' is specified, use it
 ifdef ($(CLANG))
-	CXX		= clang++
+	CC		= clang
 else
 	# set to `g++' if nothing set
-	ifndef ($(CXX))
-		CXX		= g++
+	ifndef ($(CC))
+		CC	= gcc
 	endif
 endif
 # use ccache if specified
 ifdef ($(CCACHE))
-	CXX 	= CCACHE_CPP2=1 ccache $(CROSS)$(CXX)
-	LD		= CCACHE_CPP2=1 ccache $(CROSS)$(CXX)
+	CC	= CCACHE_CPP2=1 ccache $(CROSS)$(CC)
+	LD	= CCACHE_CPP2=1 ccache $(CROSS)$(CC)
 endif
 # debugging flags
 ifdef ($(DEBUG))
 	# if specified, produce extra info
 	ifeq ($(DEBUG), 2)
-		CXXFLAGS	+= -ggdb
+		CFLAGS		+= -ggdb
 	else
 		# extra info if g++
-		ifeq ($(CXX), g++)
-			CXXFLAGS	+= -ggdb
+		ifeq ($(CC), gcc)
+			CFLAGS	+= -ggdb
 		else
-			CXXFLAGS	+= -g
+			CFLAGS	+= -g
 		endif
 	endif
 endif
 
 .PHONY: clean
 $(TARGET): $(OUT_DIR) $(OBJ_DIR) $(OBJS)
-	$(CXX) -o $@ $(OBJS) $(LIBS)
+	$(CC) -o $@ $(OBJS) $(LIBS)
 
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
@@ -53,8 +54,8 @@ $(OUT_DIR):
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) $(CPPFLAGS) $(DEFINES) $(CXXFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@
 
 clean:
 	rm -rf $(OUT_DIR) $(OBJ_DIR)

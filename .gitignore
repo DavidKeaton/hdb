@@ -32,6 +32,7 @@
 *.dSYM/
 
 # davek
+.*.sw*
 *.session
 .local.vim*
 *~
