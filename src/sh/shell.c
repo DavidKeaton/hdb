@@ -3,7 +3,7 @@
  *
  *       Filename:  shell.c
  *
- *    Description:  
+ *    Description:  hsh shell interface
  *
  *        Created:  10/07/2015 02:24:31 PM
  *
@@ -13,4 +13,8 @@
  */
 
 #include <stdlib.h>
+
+#include "shell.h"
+
+
 

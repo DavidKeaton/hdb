@@ -3,7 +3,7 @@
  *
  *       Filename:  shell.h
  *
- *    Description:  Hacker's SHell
+ *    Description:  hsh shell interface
  *
  *        Created:  10/07/2015 02:23:41 PM
  *
