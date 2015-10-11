@@ -40,4 +40,5 @@
 .backup/
 obj/
 dist/
-
+.old/
+*.vim
