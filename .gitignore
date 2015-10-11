@@ -42,3 +42,4 @@ obj/
 dist/
 .old/
 *.vim
+.gdbinit
