@@ -16,6 +16,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #include <curses.h>
 
@@ -25,10 +26,14 @@
 
 /* parse the command line options passed in */
 int parse_args(int argc, char **argv);
+/* add tabs to a buffer */
+void tabulate(char *dest, unsigned int len, char *src, int amount);
+/* print the program usage */
+void usage(void);
 /* return the index into `options' that `str' refers to */
 int index_from_arg(const char *str);
-/* turn a string from any case to lower case */
-void lowercase(char *dest, const char *str, unsigned int len);
+/* display error message according to ERROR_TYPE given */
+int error(enum ERROR_TYPE etype, const char * fmt, ...);
 
 int main(int argc, char **argv)
 {
@@ -42,7 +47,7 @@ int main(int argc, char **argv)
 int parse_args(int argc, char **argv)
 {
 	while(--argc > 0) {
-		int idx = index_from_arg(*(argv++));
+		int idx = index_from_arg(*(++argv));
 		if(idx == -1) {
 			// invalid index for argument, chances are it isn't one
 			return ERR;
@@ -53,29 +58,55 @@ int parse_args(int argc, char **argv)
 		} else {
 			switch(opt->type) {
 				case ARG_STRING:
-					strncpy(opt->where, *(argv++), PATH_MAX);
-					break;
-				case ARG_INTEGER:
-					*((int *)opt->where) = atoi(*(argv++));
-					break;
-				case ARG_BOOLEAN: {
-					char lc[16]; // nice even size
-					lowercase(lc, *argv, 16);
-					if((strcmp(lc, "true") == 0)) {
-						*((int *)opt->where) = TRUE;
-					} else if((strcmp(lc, "false") == 0)) {
-						*((int *)opt->where) = FALSE;
-					} else { // invalid response
-						*((int *)opt->where) = -1;
+					if(--argc > 0) {
+						strncpy(opt->where, *(++argv), PATH_MAX);
+					} else {
+						error(E_NOPARAM, *argv);
 					}
 					break;
-				}
+				case ARG_INTEGER:
+					*((int *)opt->where) = atoi(*(++argv));
+					break;
+				case ARG_BOOLEAN:
+					*((int *)opt->where) = (strcmp("+", *(argv++)) != 0);
+					break;
 				default:
 					return ERR;
 			}
 		}
 	}
 	return OK;
+}
+
+void tabulate(char *dest, unsigned int len, char *src, int amount)
+{
+}
+ 
+void usage(void)
+{
+	int pos = 0;
+	// standard terminal width
+	const int len = 80;
+	char msg[len];
+	// print usage header
+	printf("Usage: hsh [options] [<program>]\n");
+	memset(msg, 0, sizeof(msg));
+	// show options and their descriptions
+	for(int i = 0; options[i].type != ARG_NULL; ++i) {
+		struct opt_t *o = &options[i];
+		char *p	= msg + pos;
+		int n = len - pos;
+		// sname + lname
+		char *name = (o->sname && !o->lname) ? o->sname :
+			(o->lname && !o->sname) ? o->lname : NULL;
+		if(name) {
+			snprintf(p, n, "%s", name);
+			pos += strlen(name);
+		} else {
+			snprintf(p, n, "%s,%s", o->sname, o->lname);
+			pos += (1 + strlen(o->sname) + strlen(o->lname));
+		}
+	}
 }
 
 int index_from_arg(const char *str)
@@ -92,13 +123,12 @@ int index_from_arg(const char *str)
 	return -1;
 }
 
-void lowercase(char *dest, const char *str, unsigned int len)
+int error(enum ERROR_TYPE etype, const char *fmt, ...)
 {
-	assert(dest != NULL);
-	assert(str != NULL);
-
-	memset(dest, 0, len);
-	for(int i = 0; i < len; ++i) {
-		dest[i] = tolower(str[i]);
-	}
+	const char *msg = (fmt == NULL) ? e_msg[etype] : fmt;
+	va_list va;
+	va_start(va, fmt);
+	vfprintf(stderr, msg, va);
+	va_end(va);
+	return e_code[etype];
 }

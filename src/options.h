@@ -43,23 +43,24 @@ struct opt_t {
 };
 
 struct opt_t options[] = {
-/* arg type	  shortname	  longname		 value name		 where */
+/*	  arg type	  shortname	  longname		 value name		 where|description */
 	{ARG_BOOLEAN,	"-v",	"--verbose",		NULL,		&settings.verbose,
 		"increase the verbosity"},
 	{ARG_STRING,	"-c",	"--config",			"<file>",	&settings.config,
 		"load config <file> instead of default"},
 	{ARG_STRING,	"-S",	"--session",		"<file>",	&settings.session,
 		"load session from <file>"},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
-	{ARG_NULL,	"",	"",			">",		NULL, ""},
+	{ARG_NULL,		"-s",	"--silent",			NULL,		NULL,
+		"decrease program output"},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
+	{ARG_NULL,		"",	"",			"",		"", ""},
 };
 
 #endif   /* ----- #ifndef OPTIONS_INC  ----- */
